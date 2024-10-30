@@ -1,11 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "graph.h"
-
-typedef struct MinHeapNode {
-    int v;
-    int dist;
-} MinHeapNode;
 
 // Create a graph with given nodes
 Graph* createGraph(int nodes) {
@@ -26,33 +22,77 @@ void addEdge(Graph* graph, int src, int dest, int weight) {
     graph->adjList[src] = newNode;
 }
 
+// Heuristic function for A* (simple Euclidean distance)
+int heuristic(int a, int b) {
+    return abs(a - b); // Placeholder; normally use coordinates for Euclidean distance
+}
+
 // Min-heap helper functions
-void minHeapify(MinHeapNode heap[], int n, int i) { /* Implementation omitted for brevity */ }
+void minHeapify(MinHeapNode heap[], int n, int i) {
+    int smallest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && heap[left].dist < heap[smallest].dist)
+        smallest = left;
+
+    if (right < n && heap[right].dist < heap[smallest].dist)
+        smallest = right;
+
+    if (smallest != i) {
+        MinHeapNode temp = heap[i];
+        heap[i] = heap[smallest];
+        heap[smallest] = temp;
+        minHeapify(heap, n, smallest);
+    }
+}
+
+MinHeapNode extractMin(MinHeapNode heap[], int* n) {
+    MinHeapNode root = heap[0];
+    heap[0] = heap[*n - 1];
+    (*n)--;
+    minHeapify(heap, *n, 0);
+    return root;
+}
+
+void decreaseKey(MinHeapNode heap[], int v, int dist, int size) {
+    int i;
+    for (i = 0; i < size; i++) {
+        if (heap[i].v == v) {
+            heap[i].dist = dist;
+            break;
+        }
+    }
+    while (i && heap[i].dist < heap[(i - 1) / 2].dist) {
+        MinHeapNode temp = heap[i];
+        heap[i] = heap[(i - 1) / 2];
+        heap[(i - 1) / 2] = temp;
+        i = (i - 1) / 2;
+    }
+}
 
 // Dijkstra¡¯s Algorithm implementation
 void dijkstra(Graph* graph, int start) {
     int dist[MAX_NODES];
     bool visited[MAX_NODES] = { false };
-
     for (int i = 0; i < MAX_NODES; i++) dist[i] = INF;
     dist[start] = 0;
 
     MinHeapNode heap[MAX_NODES];
-    for (int i = 0; i < graph->numNodes; i++) heap[i] = (MinHeapNode){ i, dist[i] };
+    int size = graph->numNodes;
+    for (int i = 0; i < size; i++) heap[i] = (MinHeapNode){ i, dist[i] };
 
-    for (int i = 0; i < graph->numNodes; i++) {
-        // Extract minimum distance node (pseudo-heap operation for simplicity)
-        int u = -1;
-        for (int j = 0; j < graph->numNodes; j++) {
-            if (!visited[j] && (u == -1 || dist[j] < dist[u])) u = j;
-        }
-
+    while (size > 0) {
+        MinHeapNode minNode = extractMin(heap, &size);
+        int u = minNode.v;
         visited[u] = true;
+
         Node* adj = graph->adjList[u];
         while (adj) {
             int v = adj->dest;
             if (!visited[v] && dist[u] + adj->weight < dist[v]) {
                 dist[v] = dist[u] + adj->weight;
+                decreaseKey(heap, v, dist[v], size);
             }
             adj = adj->next;
         }
@@ -62,28 +102,20 @@ void dijkstra(Graph* graph, int start) {
     for (int i = 0; i < graph->numNodes; i++) printf("Node %d: %d\n", i, dist[i]);
 }
 
-// Heuristic function for A* (simple Euclidean distance)
-int heuristic(int a, int b) {
-    return abs(a - b); // Placeholder; normally use coordinates for Euclidean distance
-}
-
 // A* Algorithm implementation
 void aStar(Graph* graph, int start, int end, int (*heuristic)(int, int)) {
     int dist[MAX_NODES];
     bool visited[MAX_NODES] = { false };
-
     for (int i = 0; i < MAX_NODES; i++) dist[i] = INF;
     dist[start] = 0;
 
     MinHeapNode heap[MAX_NODES];
-    for (int i = 0; i < graph->numNodes; i++) heap[i] = (MinHeapNode){ i, dist[i] };
+    int size = graph->numNodes;
+    for (int i = 0; i < size; i++) heap[i] = (MinHeapNode){ i, dist[i] };
 
-    for (int i = 0; i < graph->numNodes; i++) {
-        int u = -1;
-        for (int j = 0; j < graph->numNodes; j++) {
-            if (!visited[j] && (u == -1 || dist[j] + heuristic(j, end) < dist[u] + heuristic(u, end))) u = j;
-        }
-
+    while (size > 0) {
+        MinHeapNode minNode = extractMin(heap, &size);
+        int u = minNode.v;
         if (u == end) break;
         visited[u] = true;
 
@@ -92,10 +124,12 @@ void aStar(Graph* graph, int start, int end, int (*heuristic)(int, int)) {
             int v = adj->dest;
             if (!visited[v] && dist[u] + adj->weight < dist[v]) {
                 dist[v] = dist[u] + adj->weight;
+                decreaseKey(heap, v, dist[v] + heuristic(v, end), size);
             }
             adj = adj->next;
         }
     }
 
-    printf("A* distance from node %d to node %d: %d\n", start, end, dist[end]);
+    printf("A* distances from start node %d to end node %d:\n", start, end);
+    for (int i = 0; i < graph->numNodes; i++) printf("Node %d: %d\n", i, dist[i]);
 }

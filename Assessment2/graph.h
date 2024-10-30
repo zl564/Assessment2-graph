@@ -20,10 +20,17 @@ typedef struct Graph {
     int numNodes;
 } Graph;
 
+// Min-Heap Node structure
+typedef struct MinHeapNode {
+    int v;
+    int dist;
+} MinHeapNode;
+
 // Function prototypes
 Graph* createGraph(int nodes);
 void addEdge(Graph* graph, int src, int dest, int weight);
 void dijkstra(Graph* graph, int start);
 void aStar(Graph* graph, int start, int end, int (*heuristic)(int, int));
+int heuristic(int a, int b);
 
 #endif // GRAPH_H
