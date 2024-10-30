@@ -7,7 +7,6 @@ int main() {
     // Create a graph and load data from file
     Graph* graph = createGraph(MAX_NODES);
 
-    // Sample edges; you can also load this from "input.txt" for larger datasets
     addEdge(graph, 0, 1, 4);
     addEdge(graph, 0, 2, 3);
     addEdge(graph, 1, 3, 2);

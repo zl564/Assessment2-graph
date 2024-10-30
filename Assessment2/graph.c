@@ -24,7 +24,7 @@ void addEdge(Graph* graph, int src, int dest, int weight) {
 
 // Heuristic function for A* (simple Euclidean distance)
 int heuristic(int a, int b) {
-    return abs(a - b); // Placeholder; normally use coordinates for Euclidean distance
+    return abs(a - b); 
 }
 
 // Min-heap helper functions
