@@ -26,7 +26,7 @@ int main() {
     // Get user choice
     int choice;
     printf("Enter your choice (1-%d): ", fileCount);
-    scanf("%d", &choice);
+    scanf_s("%d", &choice);
 
     // Validate the choice
     if (choice < 1 || choice > fileCount) {
@@ -52,12 +52,12 @@ int main() {
 
     // Measure execution time for A* algorithm
     begin = clock();
-    aStar(graph, start, end, heuristic); 
+    aStar(graph, start, end, heuristic);
     clock_t end_a_star = clock();
     printf("A* Time: %lf seconds\n", (double)(end_a_star - begin) / CLOCKS_PER_SEC);
 
     // Free the allocated graph memory
-    free(graph);
+    freeGraph(graph);
 
     return 0;
 }

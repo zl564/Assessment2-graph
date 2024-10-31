@@ -24,7 +24,7 @@ void addEdge(Graph* graph, int src, int dest, int weight) {
 
 // Heuristic function for A* (simple Euclidean distance)
 int heuristic(int a, int b) {
-    return abs(a - b); 
+    return abs(a - b);
 }
 
 // Min-heap helper functions
@@ -32,13 +32,10 @@ void minHeapify(MinHeapNode heap[], int n, int i) {
     int smallest = i;
     int left = 2 * i + 1;
     int right = 2 * i + 2;
-
     if (left < n && heap[left].dist < heap[smallest].dist)
         smallest = left;
-
     if (right < n && heap[right].dist < heap[smallest].dist)
         smallest = right;
-
     if (smallest != i) {
         MinHeapNode temp = heap[i];
         heap[i] = heap[smallest];
@@ -133,6 +130,7 @@ void aStar(Graph* graph, int start, int end, int (*heuristic)(int, int)) {
     printf("A* distances from start node %d to end node %d:\n", start, end);
     for (int i = 0; i < graph->numNodes; i++) printf("Node %d: %d\n", i, dist[i]);
 }
+
 // Free memory for graph
 void freeGraph(Graph* graph) {
     for (int i = 0; i < graph->numNodes; i++) {
@@ -144,4 +142,20 @@ void freeGraph(Graph* graph) {
         }
     }
     free(graph);
+}
+
+// Load graph from file
+void loadGraphFromFile(Graph* graph, const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        fprintf(stderr, "Error opening file %s\n", filename);
+        exit(EXIT_FAILURE);
+    }
+
+    int src, dest, weight;
+    while (fscanf_s(file, "%d %d %d", &src, &dest, &weight) != EOF) {
+        addEdge(graph, src, dest, weight);
+    }
+
+    fclose(file);
 }

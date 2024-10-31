@@ -4,7 +4,7 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#define MAX_NODES 100
+#define MAX_NODES 10
 #define INF INT_MAX
 
 // Node structure for adjacency list
@@ -32,5 +32,6 @@ void addEdge(Graph* graph, int src, int dest, int weight);
 void dijkstra(Graph* graph, int start);
 void aStar(Graph* graph, int start, int end, int (*heuristic)(int, int));
 int heuristic(int a, int b);
+void loadGraphFromFile(Graph* graph, const char* filename);
 
 #endif // GRAPH_H
