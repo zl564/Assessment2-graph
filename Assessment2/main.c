@@ -3,16 +3,44 @@
 #include <time.h>
 #include "graph.h"
 
+// Function prototypes
+void loadGraphFromFile(Graph* graph, const char* filename);
+
 int main() {
-    // Create a graph and load data from file
+    // List of available input files
+    const char* inputFiles[] = {
+        "input1.txt",
+        "input2.txt",
+        "input3.txt",
+        "input4.txt",
+        "input5.txt"
+    };
+    int fileCount = sizeof(inputFiles) / sizeof(inputFiles[0]);
+
+    // Display the options to the user
+    printf("Select an input file:\n");
+    for (int i = 0; i < fileCount; i++) {
+        printf("%d: %s\n", i + 1, inputFiles[i]);
+    }
+
+    // Get user choice
+    int choice;
+    printf("Enter your choice (1-%d): ", fileCount);
+    scanf("%d", &choice);
+
+    // Validate the choice
+    if (choice < 1 || choice > fileCount) {
+        fprintf(stderr, "Invalid choice. Exiting.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Create a graph
     Graph* graph = createGraph(MAX_NODES);
 
-    addEdge(graph, 0, 1, 4);
-    addEdge(graph, 0, 2, 3);
-    addEdge(graph, 1, 3, 2);
-    addEdge(graph, 2, 3, 1);
-    addEdge(graph, 3, 4, 5);
+    // Load edges from the selected input file
+    loadGraphFromFile(graph, inputFiles[choice - 1]);
 
+    // Define start and end nodes for pathfinding
     int start = 0;
     int end = 4;
 
@@ -24,10 +52,12 @@ int main() {
 
     // Measure execution time for A* algorithm
     begin = clock();
-    aStar(graph, start, end, heuristic);
+    aStar(graph, start, end, heuristic); // Assuming 'heuristic' is defined elsewhere
     clock_t end_a_star = clock();
     printf("A* Time: %lf seconds\n", (double)(end_a_star - begin) / CLOCKS_PER_SEC);
 
+    // Free the allocated graph memory
     free(graph);
+
     return 0;
 }
