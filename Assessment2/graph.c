@@ -133,3 +133,15 @@ void aStar(Graph* graph, int start, int end, int (*heuristic)(int, int)) {
     printf("A* distances from start node %d to end node %d:\n", start, end);
     for (int i = 0; i < graph->numNodes; i++) printf("Node %d: %d\n", i, dist[i]);
 }
+// Free memory for graph
+void freeGraph(Graph* graph) {
+    for (int i = 0; i < graph->numNodes; i++) {
+        Node* temp = graph->adjList[i];
+        while (temp) {
+            Node* toDelete = temp;
+            temp = temp->next;
+            free(toDelete);
+        }
+    }
+    free(graph);
+}
