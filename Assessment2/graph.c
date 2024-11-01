@@ -135,7 +135,6 @@ void aStar(Graph* graph, int start, int end, int (*heuristic)(int, int)) {
 // Generate Watts-Strogatz graph
 void generateWattsStrogatzGraph(Graph* graph, int k, double beta, int weight) {
     int numNodes = graph->numNodes;
-
     // Step 1: Create a ring lattice where each node is connected to `k` neighbors
     for (int i = 0; i < numNodes; i++) {
         for (int j = 1; j <= k / 2; j++) {
@@ -144,18 +143,17 @@ void generateWattsStrogatzGraph(Graph* graph, int k, double beta, int weight) {
             addEdge(graph, neighbor, i, weight);  // For undirected graph symmetry
         }
     }
-
     // Step 2: Rewire edges with probability `beta`
     for (int i = 0; i < numNodes; i++) {
         for (int j = 1; j <= k / 2; j++) {
             int neighbor = (i + j) % numNodes;
             if (((double)rand() / RAND_MAX) < beta) {
                 int newNeighbor;
+                bool isNeighbor;
                 do {
                     newNeighbor = rand() % numNodes;
-                } while (newNeighbor == i || ({
-                    Node * temp = graph->adjList[i];
-                    bool isNeighbor = false;
+                    isNeighbor = false;
+                    Node* temp = graph->adjList[i];
                     while (temp) {
                         if (temp->dest == newNeighbor) {
                             isNeighbor = true;
@@ -163,8 +161,8 @@ void generateWattsStrogatzGraph(Graph* graph, int k, double beta, int weight) {
                         }
                         temp = temp->next;
                     }
-                    isNeighbor;
-                    }));
+                } while (newNeighbor == i || isNeighbor);
+
                 Node** current = &(graph->adjList[i]);
                 while (*current && (*current)->dest != neighbor) {
                     current = &(*current)->next;

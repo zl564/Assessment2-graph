@@ -27,7 +27,7 @@ int main() {
     // Get user choice
     int choice;
     printf("Enter your choice (1-2): ");
-    scanf("%d", &choice);
+    scanf_s("%d", &choice);
 
     // Create a graph
     Graph* graph = createGraph(MAX_NODES);
@@ -40,13 +40,11 @@ int main() {
         }
         int fileChoice;
         printf("Enter your choice (1-%d): ", fileCount);
-        scanf("%d", &fileChoice);
-
+        scanf_s("%d", &fileChoice);
         if (fileChoice < 1 || fileChoice > fileCount) {
             fprintf(stderr, "Invalid choice. Exiting.\n");
             exit(EXIT_FAILURE);
         }
-
         // Load edges from the selected input file
         loadGraphFromFile(graph, inputFiles[fileChoice - 1]);
     }
@@ -54,15 +52,13 @@ int main() {
         int k;
         double beta;
         int weight;
-
         // Get parameters for the Watts-Strogatz model
         printf("Enter the number of neighbors (k) each node is initially connected to: ");
-        scanf("%d", &k);
+        scanf_s("%d", &k);
         printf("Enter the rewiring probability (beta, between 0 and 1): ");
-        scanf("%lf", &beta);
+        scanf_s("%lf", &beta);
         printf("Enter the weight of each edge: ");
-        scanf("%d", &weight);
-
+        scanf_s("%d", &weight);
         // Generate the Watts-Strogatz graph
         generateWattsStrogatzGraph(graph, k, beta, weight);
     }
@@ -91,4 +87,20 @@ int main() {
     freeGraph(graph);
 
     return 0;
+}
+
+// Load graph from file
+void loadGraphFromFile(Graph* graph, const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        fprintf(stderr, "Error opening file %s\n", filename);
+        exit(EXIT_FAILURE);
+    }
+
+    int src, dest, weight;
+    while (fscanf_s(file, "%d %d %d", &src, &dest, &weight) != EOF) {
+        addEdge(graph, src, dest, weight);
+    }
+
+    fclose(file);
 }
