@@ -7,6 +7,8 @@
 void loadGraphFromFile(Graph* graph, const char* filename);
 
 int main() {
+    srand(time(NULL));
+
     // List of available input files
     const char* inputFiles[] = {
         "input1.txt",
@@ -18,27 +20,56 @@ int main() {
     int fileCount = sizeof(inputFiles) / sizeof(inputFiles[0]);
 
     // Display the options to the user
-    printf("Select an input file:\n");
-    for (int i = 0; i < fileCount; i++) {
-        printf("%d: %s\n", i + 1, inputFiles[i]);
-    }
+    printf("Select an option:\n");
+    printf("1: Load graph from file\n");
+    printf("2: Generate Watts-Strogatz graph\n");
 
     // Get user choice
     int choice;
-    printf("Enter your choice (1-%d): ", fileCount);
-    scanf_s("%d", &choice);
-
-    // Validate the choice
-    if (choice < 1 || choice > fileCount) {
-        fprintf(stderr, "Invalid choice. Exiting.\n");
-        exit(EXIT_FAILURE);
-    }
+    printf("Enter your choice (1-2): ");
+    scanf("%d", &choice);
 
     // Create a graph
     Graph* graph = createGraph(MAX_NODES);
 
-    // Load edges from the selected input file
-    loadGraphFromFile(graph, inputFiles[choice - 1]);
+    if (choice == 1) {
+        // Select input file
+        printf("Select an input file:\n");
+        for (int i = 0; i < fileCount; i++) {
+            printf("%d: %s\n", i + 1, inputFiles[i]);
+        }
+        int fileChoice;
+        printf("Enter your choice (1-%d): ", fileCount);
+        scanf("%d", &fileChoice);
+
+        if (fileChoice < 1 || fileChoice > fileCount) {
+            fprintf(stderr, "Invalid choice. Exiting.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        // Load edges from the selected input file
+        loadGraphFromFile(graph, inputFiles[fileChoice - 1]);
+    }
+    else if (choice == 2) {
+        int k;
+        double beta;
+        int weight;
+
+        // Get parameters for the Watts-Strogatz model
+        printf("Enter the number of neighbors (k) each node is initially connected to: ");
+        scanf("%d", &k);
+        printf("Enter the rewiring probability (beta, between 0 and 1): ");
+        scanf("%lf", &beta);
+        printf("Enter the weight of each edge: ");
+        scanf("%d", &weight);
+
+        // Generate the Watts-Strogatz graph
+        generateWattsStrogatzGraph(graph, k, beta, weight);
+    }
+    else {
+        fprintf(stderr, "Invalid choice. Exiting.\n");
+        exit(EXIT_FAILURE);
+    }
 
     // Define start and end nodes for pathfinding
     int start = 0;
