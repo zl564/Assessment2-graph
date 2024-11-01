@@ -3,7 +3,6 @@
 #include <time.h>
 #include "graph.h"
 
-// Function prototypes
 void loadGraphFromFile(Graph* graph, const char* filename);
 
 int main() {
