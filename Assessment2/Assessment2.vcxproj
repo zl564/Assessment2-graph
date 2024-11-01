@@ -133,6 +133,7 @@
     <ClCompile Include="graph.c" />
     <ClCompile Include="graph_test.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="watts_strogatz_test.c" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input1.txt" />

@@ -29,6 +29,9 @@
     <ClCompile Include="graph_test.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="watts_strogatz_test.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input1.txt" />
