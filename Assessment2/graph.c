@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 #include "graph.h"
 
@@ -131,35 +132,6 @@ void aStar(Graph* graph, int start, int end, int (*heuristic)(int, int)) {
     for (int i = 0; i < graph->numNodes; i++) printf("Node %d: %d\n", i, dist[i]);
 }
 
-// Free memory for graph
-void freeGraph(Graph* graph) {
-    for (int i = 0; i < graph->numNodes; i++) {
-        Node* temp = graph->adjList[i];
-        while (temp) {
-            Node* toDelete = temp;
-            temp = temp->next;
-            free(toDelete);
-        }
-    }
-    free(graph);
-}
-
-// Load graph from file
-void loadGraphFromFile(Graph* graph, const char* filename) {
-    FILE* file = fopen(filename, "r");
-    if (!file) {
-        fprintf(stderr, "Error opening file %s\n", filename);
-        exit(EXIT_FAILURE);
-    }
-
-    int src, dest, weight;
-    while (fscanf_s(file, "%d %d %d", &src, &dest, &weight) != EOF) {
-        addEdge(graph, src, dest, weight);
-    }
-
-    fclose(file);
-}
-
 // Generate Watts-Strogatz graph
 void generateWattsStrogatzGraph(Graph* graph, int k, double beta, int weight) {
     int numNodes = graph->numNodes;
@@ -178,65 +150,10 @@ void generateWattsStrogatzGraph(Graph* graph, int k, double beta, int weight) {
         for (int j = 1; j <= k / 2; j++) {
             int neighbor = (i + j) % numNodes;
             if (((double)rand() / RAND_MAX) < beta) {
-                // Find a new target that is not `i` or any of its current neighbors
                 int newNeighbor;
                 do {
                     newNeighbor = rand() % numNodes;
-                } while (newNeighbor == i || /* Check if `newNeighbor` is already a neighbor of `i` */ ({
-                    Node* temp = graph->adjList[i];
-                    bool isNeighbor = false;
-                    while (temp) {
-                        if (temp->dest == newNeighbor) {
-                            isNeighbor = true;
-                            break;
-                        }
-                        temp = temp->next;
-                    }
-                    isNeighbor;
-                }));
-
-                // Rewire edge
-                // Remove the current edge to `neighbor`
-                Node** current = &(graph->adjList[i]);
-                while (*current && (*current)->dest != neighbor) {
-                    current = &(*current)->next;
-                }
-                if (*current) {
-                    Node* temp = *current;
-                    *current = (*current)->next;
-                    free(temp);
-                }
-
-                // Add new edge
-                addEdge(graph, i, newNeighbor, weight);
-                addEdge(graph, newNeighbor, i, weight);  // For undirected graph symmetry
-            }
-        }
-    }
-}
-// Generate Watts-Strogatz graph
-void generateWattsStrogatzGraph(Graph* graph, int k, double beta, int weight) {
-    int numNodes = graph->numNodes;
-
-    // Step 1: Create a ring lattice where each node is connected to `k` neighbors
-    for (int i = 0; i < numNodes; i++) {
-        for (int j = 1; j <= k / 2; j++) {
-            int neighbor = (i + j) % numNodes;
-            addEdge(graph, i, neighbor, weight);
-            addEdge(graph, neighbor, i, weight);  // For undirected graph symmetry
-        }
-    }
-
-    // Step 2: Rewire edges with probability `beta`
-    for (int i = 0; i < numNodes; i++) {
-        for (int j = 1; j <= k / 2; j++) {
-            int neighbor = (i + j) % numNodes;
-            if (((double)rand() / RAND_MAX) < beta) {
-                // Find a new target that is not `i` or any of its current neighbors
-                int newNeighbor;
-                do {
-                    newNeighbor = rand() % numNodes;
-                } while (newNeighbor == i || /* Check if `newNeighbor` is already a neighbor of `i` */ ({
+                } while (newNeighbor == i || ({
                     Node * temp = graph->adjList[i];
                     bool isNeighbor = false;
                     while (temp) {
@@ -248,9 +165,6 @@ void generateWattsStrogatzGraph(Graph* graph, int k, double beta, int weight) {
                     }
                     isNeighbor;
                     }));
-
-                // Rewire edge
-                // Remove the current edge to `neighbor`
                 Node** current = &(graph->adjList[i]);
                 while (*current && (*current)->dest != neighbor) {
                     current = &(*current)->next;
@@ -260,11 +174,22 @@ void generateWattsStrogatzGraph(Graph* graph, int k, double beta, int weight) {
                     *current = (*current)->next;
                     free(temp);
                 }
-
-                // Add new edge
                 addEdge(graph, i, newNeighbor, weight);
                 addEdge(graph, newNeighbor, i, weight);  // For undirected graph symmetry
             }
         }
     }
+}
+
+// Free all allocated memory for graph
+void freeGraph(Graph* graph) {
+    for (int i = 0; i < graph->numNodes; i++) {
+        Node* current = graph->adjList[i];
+        while (current) {
+            Node* temp = current;
+            current = current->next;
+            free(temp);
+        }
+    }
+    free(graph);
 }

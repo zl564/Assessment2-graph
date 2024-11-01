@@ -19,7 +19,7 @@ int main() {
     };
     int fileCount = sizeof(inputFiles) / sizeof(inputFiles[0]);
 
-    // Display the options to the user
+    // Display options to the user
     printf("Select an option:\n");
     printf("1: Load graph from file\n");
     printf("2: Generate Watts-Strogatz graph\n");

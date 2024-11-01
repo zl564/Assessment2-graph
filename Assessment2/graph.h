@@ -33,8 +33,7 @@ void dijkstra(Graph* graph, int start);
 void aStar(Graph* graph, int start, int end, int (*heuristic)(int, int));
 int heuristic(int a, int b);
 void loadGraphFromFile(Graph* graph, const char* filename);
-
-// New Watts-Strogatz model function
 void generateWattsStrogatzGraph(Graph* graph, int k, double beta, int weight);
+void freeGraph(Graph* graph);
 
 #endif // GRAPH_H
