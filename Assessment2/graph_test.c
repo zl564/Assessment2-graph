@@ -100,7 +100,7 @@ void test_generateWattsStrogatzGraph() {
     freeGraph(graph);  // Clean up memory
 }
 
-// Main function to run all test cases
+// Main function 
 #ifdef TEST_MODE
 int main() {
     printf("Running graph tests...\n");

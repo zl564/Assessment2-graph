@@ -57,10 +57,9 @@ void watts_strogatz_test() {
     freeGraph(graph);
 }
 
-// Main function to run tests
+// Main function 
 #ifdef TEST_MODE
 int main() {
-    // Call the test function for Watts-Strogatz graph
     watts_strogatz_test();
 
     return 0;
